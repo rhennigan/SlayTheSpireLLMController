@@ -203,7 +203,10 @@ waitingForInitialCardDrawQ[ as_ ] := TrueQ @ And[
 parseGameCommands[ s_String ] :=
     parseGameCommands @ StringCases[
         s,
-        "```" ~~ Except[ "\n" ]... ~~ "\n" ~~ Shortest[ c__ ] ~~ "\n```" :> c
+        {
+            "```" ~~ Except[ "\n" ]... ~~ "\n" ~~ Shortest[ c__ ] ~~ "\n```" :> c,
+            "```" ~~ Shortest[ c__ ] ~~ "```" /; FreeQ[ c, "\n" ] :> c
+        }
     ];
 
 

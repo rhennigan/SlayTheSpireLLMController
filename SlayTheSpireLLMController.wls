@@ -54,6 +54,12 @@ $commandSyntax = <|
     "state"   -> "  - STATE\n    - Causes CommunicationMod to immediately send a JSON representation of the current state to the external process, whether or not the game state is stable.\n    - Always available.\n"
 |>;
 
+(* Aliases *)
+$commandSyntax[ "skip"    ] = $commandSyntax[ "return"  ];
+$commandSyntax[ "cancel"  ] = $commandSyntax[ "return"  ];
+$commandSyntax[ "leave"   ] = $commandSyntax[ "return"  ];
+$commandSyntax[ "confirm" ] = $commandSyntax[ "proceed" ];
+
 $gameStateTemplate = StringTemplate[ "\
 ## Game State
 
@@ -155,9 +161,10 @@ evaluateGameState[ state_Association, commandSyntax_String ] := Enclose[
         evaluated = ConfirmMatch[ ChatEvaluate[ chat, stateInstructions ], _ChatObject, "Evaluated" ];
         message   = ConfirmBy[ Last[ evaluated[ "Messages" ], $Failed ], AssociationQ, "Message" ];
         response  = ConfirmBy[ message[ "Content" ], StringQ, "Response" ];
-        commands  = ConfirmMatch[ parseGameCommands @ response, { __String }, "Commands" ];
 
         Export[ FileNameJoin @ { $logDirectory, "sts_current.md" }, response, "String" ];
+
+        commands = ConfirmMatch[ parseGameCommands @ response, { __String }, "Commands" ];
 
         (* $skipCount = Length @ commands - 1; *)
 
@@ -209,9 +216,9 @@ parseGameCommands[ s_String ] :=
     ```
     It's simpler to just auto-correct this than to try to get the LLM to stop doing it. GPT-4 really loves JSON.
 *)
-parseGameCommands[ { block_String } ] :=
+parseGameCommands[ { block_String, ___ } ] :=
     With[ { json = Quiet @ Developer`ReadRawJSONString @ block },
-        json[ "command" ] /; MatchQ[ json, KeyValuePattern[ "command" -> _String ] ]
+        { json[ "command" ] } /; MatchQ[ json, KeyValuePattern[ "command" -> _String ] ]
     ];
 
 
@@ -219,7 +226,7 @@ parseGameCommands[ { block_String } ] :=
     Sometimes the LLM writes multiple commands, which *could* be made to work, but it's not supported yet.
     Currently, only the first one is used.
 *)
-parseGameCommands[ { block_String } ] :=
+parseGameCommands[ { block_String, ___ } ] :=
     StringSplit[ block, "\n" ];
 
 (* ::**************************************************************************************************************:: *)

@@ -23,6 +23,11 @@ wolframscript -f Setup.wls
 
 Note: For this script to work, you need [SlayTheSpireLLMController.wls](SlayTheSpireLLMController.wls) to be contained in the same directory.
 
+You can get a free version of the Wolfram Engine from [here](https://www.wolfram.com/engine/) if you do not already have a Wolfram desktop product installed (e.g. Mathematica). Alternatively, install via command line:
+```
+winget install WolframEngine
+```
+
 Next, launch the game from Steam using the "Play With Mods" option.
 
 You'll see a ModTheSpire dialog that allows you to select which mods to enable. Make sure "BaseMod" and "CommunicationMod" are selected with everything else disabled, then click the "Play" button.
